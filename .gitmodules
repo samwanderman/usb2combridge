@@ -1,0 +1,3 @@
+[submodule "serialport"]
+	path = serialport
+	url = git://github.com/samwanderman/serialport.git
