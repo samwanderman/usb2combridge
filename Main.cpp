@@ -20,7 +20,7 @@
 #include <string>
 #include <type_traits>
 
-#include "serialport/SerialPort.h"
+#include "libs/serialport/SerialPort.h"
 
 #define TEST_MODE
 #define DAEMON

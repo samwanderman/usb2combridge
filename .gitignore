@@ -1,5 +1,4 @@
-.cproject
-.project
-.settings
-Debug
-USB2COMBridge
+*.o
+*.d
+/Debug/USB2COMBridge
+
