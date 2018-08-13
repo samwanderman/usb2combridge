@@ -2,13 +2,13 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include <signal.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <syslog.h>
 #include <unistd.h>
 #include <chrono>
+#include <csignal>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -18,9 +18,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
-#include <type_traits>
-
-#include "libs/serialport/SerialPort.h"
+#include <couriercxx/connection/serialport/SerialPort.h>
 
 #define TEST_MODE
 #define DAEMON

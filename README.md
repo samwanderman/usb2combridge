@@ -1,4 +1,10 @@
-Как установить службу:
-1) Скопировать файл ./boot/config в /etc/USB2COMBridge
-2) Скопировать бинарник ./Debug/USB2COMBridge в /usr/sbin/
-3) Скопировать ./boot/USB2COMBridge в /etc/init.d/
+=== INFO ===
+USB to COM bridge
+
+=== REQUIREMENTS ===
+- libCourierCXX
+
+=== HOWTO ===
+1) copy ./boot/config to /etc/USB2COMBridge
+2) copy ./Debug/USB2COMBridge to /usr/sbin/
+3) copy ./boot/USB2COMBridge to /etc/init.d/
