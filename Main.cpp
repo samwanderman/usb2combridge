@@ -96,7 +96,7 @@ void* portReader(void* args) {
 	int efd = epoll_create1(0);
 	if (efd == -1) {
 		config->thPortReaderRunning = false;
-		printLog(LOG_ERR, "E: epoll_create1() failed");
+		printLog(LOG_ERR, "E: epoll_create1() error");
 
 		return nullptr;
 	}
@@ -107,7 +107,7 @@ void* portReader(void* args) {
 
 	if (epoll_ctl(efd, EPOLL_CTL_ADD, config->port->getRawHandler(), &event) == -1) {
 		config->thPortReaderRunning = false;
-		printLog(LOG_ERR, "E: epoll_ctl() failed");
+		printLog(LOG_ERR, "E: epoll_ctl() error");
 
 		return nullptr;
 	}
@@ -117,7 +117,7 @@ void* portReader(void* args) {
 		int res = epoll_wait(efd, events, MAX_EVENTS, -1);
 		if (res == -1) {
 			config->thPortReaderRunning = false;
-			printLog(LOG_ERR, "E: epoll_wait() failed");
+			printLog(LOG_ERR, "E: epoll_wait() error");
 
 			return nullptr;
 		}
@@ -128,7 +128,7 @@ void* portReader(void* args) {
 				printLog(LOG_ERR, "E: port connection error");
 
 				if (config->port->close() == -1) {
-					printLog(LOG_ERR, "E: port->close() failed");
+					printLog(LOG_ERR, "E: port->close() error");
 
 					return nullptr;
 				}
@@ -137,7 +137,7 @@ void* portReader(void* args) {
 				while (true) {
 					printLog(LOG_INFO, "D: try to connect...");
 					if (config->port->open() != -1) {
-						printLog(LOG_ERR, "E: port->open() failed");
+						printLog(LOG_ERR, "E: port->open() error");
 
 						break;
 					}
@@ -146,14 +146,14 @@ void* portReader(void* args) {
 				}
 
 				if (epoll_ctl(efd, EPOLL_CTL_DEL, events[i].data.fd, nullptr) == -1) {
-					printLog(LOG_ERR, "E: epoll_ctl(EPOLL_CTL_DEL) failed");
+					printLog(LOG_ERR, "E: epoll_ctl(EPOLL_CTL_DEL) error");
 
 					return nullptr;
 				}
 				printLog(LOG_INFO, "D: epoll_ctl(EPOLL_CTL_DEL) success");
 
 				if (epoll_ctl(efd, EPOLL_CTL_ADD, config->port->getRawHandler(), &event) == -1) {
-					printLog(LOG_ERR, "E: epoll_ctl(EPOLL_CTL_ADD) failed");
+					printLog(LOG_ERR, "E: epoll_ctl(EPOLL_CTL_ADD) error");
 
 					return nullptr;
 				}
@@ -210,7 +210,7 @@ void* portWriter(void* args) {
 			std::cout << "-PW----------" << std::endl;
 
 			if (config->port->write(buffer, bufferLen) == -1) {
-				printLog(LOG_ERR, "E: port->write() failed");
+				printLog(LOG_ERR, "E: port->write() error");
 
 				break;
 			}
@@ -241,7 +241,7 @@ int readFromSocket(ConfigT* config) {
 	uint16_t bufferLen = 0;
 
 	if ((bufferLen = read(config->socket, buffer, QUEUE_MSIZE * sizeof(uint8_t))) == -1) {
-		printLog(LOG_ERR, "E: read() failed");
+		printLog(LOG_ERR, "E: read() error");
 
 		return -1;
 	}
@@ -369,7 +369,7 @@ void* socketWriter(void* args) {
 			std::cout << "-SW----------" << std::endl;
 
 			if (write(config->socket, buffer, bufferLen) == -1) {
-				printLog(LOG_ERR, "E: socket->write() failed");
+				printLog(LOG_ERR, "E: socket->write() error");
 				exit(0);
 
 				break;
@@ -397,7 +397,7 @@ void* socketWriter(void* args) {
 
 int startPortThreads(ConfigT* config) {
 	if (pthread_create(&config->thPortReader, nullptr, portReader, config) < 0) {
-		printLog(LOG_ERR, "E: pthread_create(thPortReader) failed");
+		printLog(LOG_ERR, "E: pthread_create(thPortReader) error");
 
 		return -1;
 	}
@@ -405,7 +405,7 @@ int startPortThreads(ConfigT* config) {
 
 	if (pthread_create(&config->thPortWriter, nullptr, portWriter, config) < 0) {
 		pthread_join(config->thPortReader, nullptr);
-		printLog(LOG_ERR, "E: pthread_create(thPortWriter) failed");
+		printLog(LOG_ERR, "E: pthread_create(thPortWriter) error");
 
 		return -1;
 	}
@@ -416,14 +416,14 @@ int startPortThreads(ConfigT* config) {
 
 int stopPortThreads(ConfigT* config) {
 	if (pthread_join(config->thPortReader, nullptr) < 0) {
-		printLog(LOG_ERR, "E: pthread_join(thPortReader) failed");
+		printLog(LOG_ERR, "E: pthread_join(thPortReader) error");
 
 		return -1;
 	}
 	printLog(LOG_INFO, "D: pthread_join(thPortReader) success");
 
 	if (pthread_join(config->thPortWriter, nullptr) < 0) {
-		printLog(LOG_ERR, "E: pthread_join(thPortWriter) failed");
+		printLog(LOG_ERR, "E: pthread_join(thPortWriter) error");
 
 		return -1;
 	}
@@ -434,7 +434,7 @@ int stopPortThreads(ConfigT* config) {
 
 int startSocketThreads(ConfigT* config) {
 	if (pthread_create(&config->thSocketWriter, nullptr, socketWriter, config) < 0) {
-		printLog(LOG_ERR, "E: pthread_create(thSocketWriter) failed");
+		printLog(LOG_ERR, "E: pthread_create(thSocketWriter) error");
 
 		return -1;
 	}
@@ -445,7 +445,7 @@ int startSocketThreads(ConfigT* config) {
 
 int stopSocketThreads(ConfigT* config) {
 	if (pthread_join(config->thSocketWriter, nullptr) < 0) {
-		printLog(LOG_ERR, "E: pthread_join(thSocketWriter) failed");
+		printLog(LOG_ERR, "E: pthread_join(thSocketWriter) error");
 
 		return -1;
 	}
@@ -490,7 +490,7 @@ int main(int argc, char** argv) {
 
 #ifdef DAEMON
 	if (pid == -1) {
-		printLog(LOG_ERR, "E: fork() failed");
+		printLog(LOG_ERR, "E: fork() error");
 
 		return -1;
 	} else if (pid != 0) {
@@ -547,7 +547,7 @@ int main(int argc, char** argv) {
 	config->port = new SerialPort(PORT_NAME.c_str(), PORT_SPEED);
 	if (config->port->open() == -1) {
 		char str[128];
-		sprintf(str, "E: SerialPort.open(%s, %i) failed\r\n", PORT_NAME.c_str(), PORT_SPEED);
+		sprintf(str, "E: SerialPort.open(%s, %i) error\r\n", PORT_NAME.c_str(), PORT_SPEED);
 		printLog(LOG_ERR, str);
 		closeLogger();
 
@@ -557,7 +557,7 @@ int main(int argc, char** argv) {
 
 	if (startPortThreads(config) == -1) {
 		config->port->close();
-		printLog(LOG_ERR, "E: startPortThreads() failed");
+		printLog(LOG_ERR, "E: startPortThreads() error");
 		closeLogger();
 
 		return -1;
@@ -578,7 +578,7 @@ int main(int argc, char** argv) {
 		stopPortThreads(config);
 		config->port->close();
 #endif
-		printLog(LOG_ERR, "E: socket() failed");
+		printLog(LOG_ERR, "E: socket() error");
 		closeLogger();
 
 		return -1;
@@ -592,7 +592,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: setsockopt() failed");
+		printLog(LOG_ERR, "E: setsockopt() error");
 		closeLogger();
 
 		return -1;
@@ -605,7 +605,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: setNonBlocking() failed");
+		printLog(LOG_ERR, "E: setNonBlocking() error");
 		closeLogger();
 
 		return -1;
@@ -618,7 +618,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: bind() failed");
+		printLog(LOG_ERR, "E: bind() error");
 		closeLogger();
 
 		return -1;
@@ -631,7 +631,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: listen() failed");
+		printLog(LOG_ERR, "E: listen() error");
 		closeLogger();
 
 		return -1;
@@ -648,7 +648,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: epoll_create1() failed");
+		printLog(LOG_ERR, "E: epoll_create1() error");
 		closeLogger();
 
 		return -1;
@@ -662,7 +662,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: epoll_ctl() failed");
+		printLog(LOG_ERR, "E: epoll_ctl() error");
 		closeLogger();
 
 		return -1;
@@ -676,7 +676,7 @@ int main(int argc, char** argv) {
 			config->port->close();
 #endif
 			close(serverSocket);
-			printLog(LOG_ERR, "E: epoll_wait() failed");
+			printLog(LOG_ERR, "E: epoll_wait() error");
 			closeLogger();
 
 			return -1;
@@ -688,7 +688,7 @@ int main(int argc, char** argv) {
 
 				if (events[n].events & (EPOLLIN | EPOLLET)) {
 					if ((config->socket = accept(serverSocket, (struct sockaddr*) &addr, (unsigned int*)&addrLen)) == -1) {
-						printLog(LOG_ERR, "E: accept() failed");
+						printLog(LOG_ERR, "E: accept() error");
 
 						continue;
 					}
@@ -697,7 +697,7 @@ int main(int argc, char** argv) {
 					if (setNonBlocking(config->socket) == -1) {
 						close(config->socket);
 						config->socket = -1;
-						printLog(LOG_ERR, "E: setNonBlocking() failed");
+						printLog(LOG_ERR, "E: setNonBlocking() error");
 
 						continue;
 					}
@@ -709,7 +709,7 @@ int main(int argc, char** argv) {
 					if (epoll_ctl(epollFd, EPOLL_CTL_ADD, config->socket, &ev) == -1) {
 						close(config->socket);
 						config->socket = -1;
-						printLog(LOG_ERR, "E: epoll_ctl() failed");
+						printLog(LOG_ERR, "E: epoll_ctl() error");
 
 						continue;
 					}
@@ -717,7 +717,7 @@ int main(int argc, char** argv) {
 					if (startSocketThreads(config) == -1) {
 						close(config->socket);
 						config->socket = -1;
-						printLog(LOG_ERR, "E: startSocketThreads() failed");
+						printLog(LOG_ERR, "E: startSocketThreads() error");
 
 						continue;
 					}
@@ -727,7 +727,7 @@ int main(int argc, char** argv) {
 
 				if (events[n].events & (EPOLLERR | EPOLLRDHUP | EPOLLHUP)) {
 					if (epoll_ctl(epollFd, EPOLL_CTL_DEL, events[n].data.fd, nullptr) == -1) {
-						printLog(LOG_ERR, "E: epoll_ctl() failed");
+						printLog(LOG_ERR, "E: epoll_ctl() error");
 
 						continue;
 					}
@@ -748,7 +748,7 @@ int main(int argc, char** argv) {
 	if (stopPortThreads(config) == -1) {
 		config->port->close();
 		close(serverSocket);
-		printLog(LOG_ERR, "E: stopPortThreads() failed");
+		printLog(LOG_ERR, "E: stopPortThreads() error");
 		closeLogger();
 
 		return -1;
@@ -761,7 +761,7 @@ int main(int argc, char** argv) {
 		config->port->close();
 #endif
 		close(serverSocket);
-		printLog(LOG_ERR, "E: close(serverSocket) failed");
+		printLog(LOG_ERR, "E: close(serverSocket) error");
 		closeLogger();
 
 		return -1;
@@ -771,7 +771,7 @@ int main(int argc, char** argv) {
 #ifndef TEST_MODE
 	if (config->port->close() == -1) {
 		close(serverSocket);
-		printLog(LOG_ERR, "E: port->close() failed");
+		printLog(LOG_ERR, "E: port->close() error");
 		closeLogger();
 
 		return -1;
@@ -780,7 +780,7 @@ int main(int argc, char** argv) {
 #endif
 
 	if (close(serverSocket) == -1) {
-		printLog(LOG_ERR, "E: close() failed");
+		printLog(LOG_ERR, "E: close() error");
 		closeLogger();
 
 		return -1;

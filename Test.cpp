@@ -14,7 +14,7 @@
 int main() {
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == -1) {
-		std::cerr << "E: socket() failed" << std::endl;
+		std::cerr << "E: socket() error" << std::endl;
 		return -1;
 	}
 
@@ -25,7 +25,7 @@ int main() {
 	sa.sin_addr.s_addr = inet_addr(IP);
 
 	if (connect(sock, (struct sockaddr*)&sa, sizeof(sa)) == -1) {
-		std::cerr << "E: connect() failed" << std::endl;
+		std::cerr << "E: connect() error" << std::endl;
 		return -1;
 	}
 
@@ -39,7 +39,7 @@ int main() {
 
 	if (write(sock, buffer, bufferLen) == -1) {
 		close(sock);
-		std::cerr << "E: write() failed" << std::endl;
+		std::cerr << "E: write() error" << std::endl;
 		return -1;
 	}
 	std::cout << "D: write() success" << std::endl;
@@ -47,7 +47,7 @@ int main() {
 
 	if ((bufferLen = read(sock, buffer, BUF_MSIZE)) == -1) {
 		close(sock);
-		std::cerr << "E: read() failed" << std::endl;
+		std::cerr << "E: read() error" << std::endl;
 		return -1;
 	}
 	std::cout << "D: read() success" << std::endl;
@@ -82,7 +82,7 @@ int main(int ac, char** av) {
 
 	int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (res == -1) {
-		std::cerr << "E: WSAStartup() failed" << std::endl;
+		std::cerr << "E: WSAStartup() error" << std::endl;
 
 		return -1;
 	}
@@ -95,7 +95,7 @@ int main(int ac, char** av) {
 
 	res = getaddrinfo(DEFAULT_HOST, DEFAULT_PORT, &config, &result);
 	if (res == -1) {
-		std::cerr << "E: getaddrinfo() failed" << std::endl;
+		std::cerr << "E: getaddrinfo() error" << std::endl;
 		WSACleanup();
 
 		return -1;
@@ -105,7 +105,7 @@ int main(int ac, char** av) {
 	ptr = result;
 	sock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 	if (sock == INVALID_SOCKET) {
-		std::cerr << "E: socket() failed" << std::endl;
+		std::cerr << "E: socket() error" << std::endl;
 		WSACleanup();
 
 		return -1;
@@ -116,7 +116,7 @@ int main(int ac, char** av) {
 	if (res == -1) {
 		closesocket(sock);
 		sock = INVALID_SOCKET;
-		std::cerr << "E: connect() failed" << std::endl;
+		std::cerr << "E: connect() error" << std::endl;
 
 		return -1;
 	}
@@ -126,7 +126,7 @@ int main(int ac, char** av) {
 
 	if (sock == INVALID_SOCKET) {
 		WSACleanup();
-		std::cerr << "E: socket failed" << std::endl;
+		std::cerr << "E: socket error" << std::endl;
 
 		return -1;
 	}
@@ -141,7 +141,7 @@ int main(int ac, char** av) {
 	if (res == -1) {
 		closesocket(sock);
 		WSACleanup();
-		std::cerr << "E: write() failed" << std::endl;
+		std::cerr << "E: write() error" << std::endl;
 
 		return -1;
 	}
@@ -159,7 +159,7 @@ int main(int ac, char** av) {
 		} else if (res == 0) {
 			std::cout << "D: connection closed" << std::endl;
 		} else {
-			std::cerr << "E: recv() failed" << std::endl;
+			std::cerr << "E: recv() error" << std::endl;
 		}
 	} while(res > 0);
 
@@ -167,7 +167,7 @@ int main(int ac, char** av) {
 	if (res == SOCKET_ERROR) {
 		closesocket(sock);
 		WSACleanup();
-		std::cerr << "E: shutdown() failed" << std::endl;
+		std::cerr << "E: shutdown() error" << std::endl;
 
 		return -1;
 	}
